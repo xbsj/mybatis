@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xbsj.mapper.UserMapper">
+
+    <!-- resultMap  配置Java对象属性和查询结果列的对应关系
+        id：标识符
+        type：用于配置查询列所映射到的Java对象类型
+        extends：可以配置当前的resultMap继承自其他的resultMap,属性为继承resultMap的id
+
+    -->
+    <resultMap id="userMap" type="SysUser">
+        <!--
+            id：一个id结果，标记结果作为id(唯一值)，可以帮助提高整体性能
+            result：注入到Java对象属性的普通结果
+        -->
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userPassword" column="user_password"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="userInfo" column="user_info"/>
+        <result property="headImg" column="head_img"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <!-- select 查询
+        id：标识符，跟Mapper接口方法保持一致，不可以重复
+        parameterType：传入的值类型
+        resultType：返回数据类型
+        resultMap：用于设置返回值的类型和映射关系
+      -->
+    <select id="selectUserById" parameterType="Integer" resultMap="userMap">
+        SELECT user_id,user_name,user_password,user_email,user_info,head_img,create_time
+        FROM sys_user WHERE user_id = #{id}
+    </select>
+    <!--<select id="selectUserById" parameterType="Integer" resultType="SysUser">
+        SELECT user_id,user_name,user_password,user_email,user_info,head_img,create_time
+        FROM sys_user WHERE user_id = #{id}
+    </select>-->
+
+    <!--
+        使用JDBC方式返回主键自增的值
+        useGeneratedKeys：获取由数据库内部生成的主键，默认为 false
+        keyProperty：获取到主键值后将其赋值给userId属性
+    -->
+    <!--<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO sys_user(user_name,user_password,user_email,user_info,head_img,create_time)
+        VALUES (#{userName},#{userPassword},#{userEmail},#{userInfo},#{headImg},#{createTime})
+    </insert>-->
+
+    <!--  使用selectKey返回主键的值
+        这种方法不止适用于MySql，还适用于Oracle
+        selectKey 属性介绍
+            keyColumn：对应数据表的主键
+            resultType：返回类型
+            keyProperty：实体类相对应的属性
+            order:
+                AFTER：适用于MySql
+                BEFORE：适用于Oracle
+    -->
+    <!-- mysql -->
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO sys_user(user_name,user_password,user_email,user_info,head_img,create_time)
+        VALUES (#{userName},#{userPassword},#{userEmail},#{userInfo},#{headImg},#{createTime})
+        <selectKey keyColumn="user_id" resultType="Integer" keyProperty="userId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- oracle-->
+    <!--<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+        <selectKey keyColumn="user_id" resultType="Integer" keyProperty="userId" order="BEFORE">
+            SELECT SQL_ID.nextval FROM dual
+        </selectKey>
+        INSERT INTO sys_user(user_name,user_password,user_email,user_info,head_img,create_time)
+        VALUES (#{userName},#{userPassword},#{userEmail},#{userInfo},#{headImg},#{createTime})
+    </insert>-->
+
+
+    <update id="updateUserInfo" parameterType="SysUser">
+        UPDATE sys_user SET user_name = #{userName} WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Integer">
+        DELETE FROM sys_user WHERE user_id = #{id}
+    </delete>
+
+</mapper>
