@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 加载数据库四要素 -->
+    <properties resource="jdbc.properties" />
+    
+    <settings>
+        <!-- 将以下划线方式命名的数据列映射到Java对象的驼峰式命名属性中 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+
+        <!-- 指定使用log4j记录日志  -->
+        <setting name="logImpl" value="LOG4J" />
+    </settings>
+
+    <!-- 设置别名 -->
+    <typeAliases>
+        <!-- 批量别名定义，扫描整个包下的类，别名为类名（首字母大小写都可以） -->
+        <package name="com.xbsj.entity" />
+    </typeAliases>
+
+    <!-- 设置mybatis运行时环境 -->
+    <environments default="mysql">
+        <environment id="mysql">
+            <transactionManager type="JDBC" />  <!-- 事物 -->
+            <dataSource type="POOLED">  <!-- 数据源 tomcat：JNDL mybatis:POOLED -->
+                <property name="driver" value="${jdbc.driver}" />
+                <property name="url" value="${jdbc.url}" />
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+            </dataSource>
+        </environment>
+    </environments>
+    
+    <mappers>
+        <!-- 管理单个的mapper问价 -->
+       <!-- <mapper resource="com/xbsj/mapper/UserMapper.xml" />-->
+        <!-- 管理所在包下的所有mapper文件 -->
+        <package name="com.xbsj.mapper"  />
+    </mappers>
+</configuration>
