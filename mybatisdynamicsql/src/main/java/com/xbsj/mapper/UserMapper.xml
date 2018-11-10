@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xbsj.mapper.UserMapper">
+
+    <!--
+        在 where 条件中使用if标签
+    -->
+   <!-- <select id="selectByUser" resultType="SysUser">
+        SELECT u.* FROM sys_user u WHERE 1=1
+        <if test="userName != null and userName !=''">
+            AND u.user_name LIKE concat('%',#{userName},'%')
+        </if>
+
+        <if test="userEmail != null and userEmail != ''">
+            AND u.user_email = #{userEmail}
+        </if>
+    </select>-->
+
+    <!-- 使用 bing 标签实现模糊查询 -->
+    <select id="selectByUser" resultType="SysUser">
+        SELECT u.* FROM sys_user u WHERE 1=1
+        <if test="userName != null and userName !=''">
+            <bind name="userNameLike" value="'%'+ userName + '%'" />
+            AND u.user_name LIKE #{userNameLike}
+    </if>
+
+        <if test="userEmail != null and userEmail != ''">
+            AND u.user_email = #{userEmail}
+        </if>
+    </select>
+
+    <!-- choose 相当于Java当中 if else
+        在choose标签中至少有一个when标签，otherwise标签可以有0个或一个
+    -->
+    <select id="seletByIdOrUserName" resultType="SysUser">
+        SELECT u.* FROM sys_user u WHERE 1=1
+        <choose>
+            <when test="id != null">
+                AND u.user_id = #{id}
+            </when>
+            <when test="userName != null and userName != ''">
+                AND u.user_name = #{userName}
+            </when>
+            <otherwise>
+                AND 1=2
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- where标签 -->
+    <!--<select id="selectByUserNameAndUserEmail" resultType="SysUser">
+        SELECT u.* FROM sys_user u
+        <where>
+            <if test="userName != null and userName !=''">
+                AND u.user_name LIKE concat('%',#{userName},'%')
+            </if>
+
+            <if test="userEmail != null and userEmail != ''">
+                AND u.user_email = #{userEmail}
+            </if>
+        </where>
+    </select>-->
+
+
+    <!-- trim 替换 where
+        trim 标记是一个格式化的标记
+            prefix：前缀
+            prefixOverrides:去掉第一个AND或者Or
+            suffix:后缀
+            suffixOverride：去掉最后一个标记
+    -->
+    <select id="selectByUserNameAndUserEmail" resultType="SysUser">
+        SELECT u.* FROM sys_user u
+        <trim prefix="WHERE" prefixOverrides="AND |OR">
+            <if test="userName != null and userName !=''">
+                AND u.user_name LIKE concat('%',#{userName},'%')
+            </if>
+
+            <if test="userEmail != null and userEmail != ''">
+                AND u.user_email = #{userEmail}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 使用set标签实现修改 -->
+    <!--<update id="updateUserById">
+        UPDATE sys_user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userPassword != null and userPassword != ''">
+                user_password = #{userPassword},
+            </if>
+            <if test="userEmail != null and userEmail != ''">
+                user_email = #{userEmail},
+            </if>
+            <if test="userInfo != null and userInfo != ''">
+                user_info = #{userInfo},
+            </if>
+            <if test="headImg != null">
+                head_img = #{headImg,jdbcType=BLOB},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime}
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>-->
+
+    <!-- 使用trim标签 替代set -->
+    <update id="updateUserById">
+        UPDATE sys_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userPassword != null and userPassword != ''">
+                user_password = #{userPassword},
+            </if>
+            <if test="userEmail != null and userEmail != ''">
+                user_email = #{userEmail},
+            </if>
+            <if test="userInfo != null and userInfo != ''">
+                user_info = #{userInfo},
+            </if>
+            <if test="headImg != null">
+                head_img = #{headImg,jdbcType=BLOB},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime}
+            </if>
+        </trim>
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 使用 foreach 实现多id查询 -->
+    <select id="selectByIdList" resultType="SysUser">
+        SELECT u.* FROM sys_user u
+        WHERE u.user_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="id" index="i">
+            #{id}
+        </foreach>
+    </select>
+
+
+</mapper>
