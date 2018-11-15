@@ -13,3 +13,7 @@ mybatis annotation
 
 mybatis dynamic  sql
       基于mybatis 实现动态sql
+
+mybatis generator
+      基于mybatis 代码生成器
+
